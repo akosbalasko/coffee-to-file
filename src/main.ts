@@ -21,10 +21,16 @@ export async function run(): Promise<void> {
     const decodedReadme = fs.readFileSync(fileName, 'utf-8')
 
     const numberOfMessages = Number(core.getInput('NUMBER_OF_MESSAGES'))
-    const messages = supporters.data
-      .slice(0, numberOfMessages)
-      .map((supporter: CoffeeSupporter) => generateMessageLine(supporter))
-      .join('\n')
+    const messages = Array.isArray(supporters?.data)
+      ? supporters.data
+        .slice(0, numberOfMessages)
+        .map((supporter: CoffeeSupporter) => generateMessageLine(supporter))
+        .join('\n')
+      : ''
+    if (!messages) {
+        core.info("No supporters yet!")
+        return;
+    }
     const updatedReadme = saveBMAC2File(decodedReadme, messages)
 
     fs.writeFileSync(fileName, updatedReadme);
